@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KE-PAPAS - Menú Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(rgba(18, 18, 18, 0.92), rgba(18, 18, 18, 0.92)), 
+                        url('lamina.jpg') repeat center center;
+            background-size: 300px;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding-bottom: 100px;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95vw;
+            max-width: 1100px;
+            height: 80vh;
+            background: url('k-papas.jpeg') no-repeat center center;
+            background-size: contain;
+            opacity: 0.18;
+            z-index: -1;
+            pointer-events: none;
+            filter: drop-shadow(0 0 20px rgba(230, 0, 0, 0.2));
+        }
+
+        header {
+            text-align: center;
+            padding: 15px 10px;
+            background: #0a0a0a;
+            border-bottom: 2px solid #222;
+            position: relative;
+            z-index: 10;
+        }
+
+        header img.logo {
+            max-width: 220px;
+            width: 65%;
+            height: auto;
+        }
+
+        nav {
+            background: #111111;
+            padding: 10px 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 3px solid #ff1a1a;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 500;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        nav button {
+            display: inline-block;
+            color: #ccc;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 8px 14px;
+            margin-right: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        nav button:hover, nav button.activo {
+            background: #e60000;
+            color: #fff;
+            border-color: #ff3333;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        section.oculto {
+            display: none;
+        }
+
+        h2.categoria-titulo {
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            border-left: 4px solid #e60000;
+            padding-left: 10px;
+            margin-bottom: 12px;
+            background: rgba(25, 25, 25, 0.85);
+            padding-top: 6px;
+            padding-bottom: 6px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        h3.subcategoria-titulo {
+            font-size: 1.1rem;
+            color: #ffcc00;
+            text-transform: uppercase;
+            margin: 18px 0 10px 0;
+            border-bottom: 1px solid #444;
+            padding-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .card-producto {
+            background: linear-gradient(145deg, rgba(36, 36, 36, 0.9), rgba(26, 26, 26, 0.9));
+            border: 1px solid #3d3d3d;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card-producto:hover {
+            border-color: #e60000;
+            transform: translateY(-2px);
+        }
+
+        .card-imagen {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 1px solid #333;
+        }
+
+        .card-body {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .card-info h3 { color: #fff; font-size: 1.05rem; margin-bottom: 4px; }
+        .card-info p { color: #aaa; font-size: 0.82rem; margin-bottom: 10px; line-height: 1.3; }
+        .card-precio { font-size: 1.05rem; font-weight: bold; color: #ff4d4d; text-align: right; border-top: 1px dashed #3a3a3a; padding-top: 6px; }
+        
+        .btn-personalizar, .btn-agregar-directo {
+            margin-top: 8px;
+            background: #e60000;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-personalizar:hover, .btn-agregar-directo:hover {
+            background: #ff1a1a;
+        }
+
+        /* Barra Inferior Fija */
+        .barra-pedido {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #0d0d0d;
+            border-top: 2px solid #e60000;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 900;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.8);
+        }
+
+        .info-total {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .label-total {
+            font-size: 0.75rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .monto-total {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .badge-cantidad {
+            font-size: 0.8rem;
+            color: #ffcc00;
+            font-weight: 600;
+        }
+
+        .btn-ver-pedido {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-ver-pedido:hover {
+            background: #32c853;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.88);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .modal-contenido {
+            background: #1e1e1e;
+            border: 2px solid #e60000;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 16px;
+            color: #fff;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .modal-header h3 { color: #ff4d4d; font-size: 1.1rem; }
+        .cerrar-modal { background: none; border: none; color: #fff; font-size: 1.6rem; cursor: pointer; padding: 0 5px; }
+
+        .opcion-grupo { margin-bottom: 14px; }
+        .opcion-grupo h4 { font-size: 0.92rem; color: #ffcc00; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+
+        .checkbox-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            background: #2a2a2a;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item input { margin-right: 8px; accent-color: #e60000; width: 16px; height: 16px; }
+
+        .btn-confirmar {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .item-carrito {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .item-detalles h4 { font-size: 0.9rem; color: #fff; }
+        .item-detalles p { font-size: 0.78rem; color: #aaa; margin-top: 2px; }
+        .item-precio-eliminar { text-align: right; }
+        .btn-eliminar { background: none; border: none; color: #ff4d4d; font-weight: bold; cursor: pointer; margin-top: 4px; font-size: 0.78rem; }
+
+        /* Formulario Cliente */
+        .form-grupo {
+            margin-bottom: 10px;
+        }
+        .form-grupo label {
+            display: block;
+            font-size: 0.8rem;
+            color: #ffcc00;
+            margin-bottom: 4px;
+        }
+        .form-grupo input, .form-grupo select, .form-grupo textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 0.85rem;
+        }
+        .form-grupo textarea {
+            resize: vertical;
+            height: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-productos {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 8px;
+            }
+            .card-imagen {
+                height: 110px;
+            }
+            .card-body {
+                padding: 8px;
+            }
+            .card-info h3 { font-size: 0.95rem; }
+            .card-info p { font-size: 0.75rem; }
+            .checkbox-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="k-papas.jpeg" alt="KE-PAPAS Burgers al Carbón" class="logo">
+    </header>
+
+    <nav>
+        <button class="btn-nav activo" onclick="filtrarCategoria('todas', this)">Ver Todo</button>
+        <button class="btn-nav" onclick="filtrarCategoria('promociones', this)">Promociones</button>
+        <button class="btn-nav" onclick="filtrarCategoria('hamburguesas', this)">Hamburguesas</button>
+        <button class="btn-nav" onclick="filtrarCategoria('boneless-alitas', this)">Boneless y Alitas</button>
+        <button class="btn-nav" onclick="filtrarCategoria('hotdogs', this)">Hotdogs</button>
+        <button class="btn-nav" onclick="filtrarCategoria('snacks', this)">Snacks</button>
+        <button class="btn-nav" onclick="filtrarCategoria('bebidas', this)">Bebidas</button>
+        <button class="btn-nav" onclick="filtrarCategoria('tortas-tacos', this)">Tortas y Tacos</button>
+    </nav>
+
+    <main>
+
+        <section id="promociones" class="seccion-menu">
+            <h2 class="categoria-titulo">Promociones y Combos</h2>
+            <div class="grid-productos">
+
+                <article class="card-producto">
+                    <img src="boneles.jpg" alt="Promo Boneless $99" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Promo Boneless $99</h3>
+                            <p>¡El antojo de la semana! Válido de Lunes a Miércoles. Acompañados de papas, zanahoria, apio y aderezo ranch. Hechos al momento + Salsa a elegir.</p>
+                        </div>
+                        <div class="card-precio">$99.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Promo Boneless $99 (Lunes a Miércoles)', 'boneless-lunes-miercoles', 99)">Elegir Salsa</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="ke-kids.jpg" alt="Combo KE-KIDS" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>KE-KIDS</h3>
+                            <p>El combo de los pequeños campeones. Elije 1 favorito (Hamburguesa, Nuggets, Banderilla o 5 Mini Boneless). Incluye Papas de 80g y Capri-Sun de 80g.</p>
+                        </div>
+                        <div class="card-precio">$89.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('KE-KIDS', 'ke-kids', 89)">Elegir Favorito</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="combo-campestre.jpg" alt="Combo Campestre" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Combo Campestre</h3>
+                            <p>Hamburguesa campestre (carne, queso, salchicha para asar, guacamole), 5 boneless, Papas 80g y Coca-Cola de lata</p>
+                        </div>
+                        <div class="card-precio">$129.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Combo Campestre', 'combo', 129)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="combo-hawaiana.jpg" alt="Combo Hawaiana" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Combo Hawaiana</h3>
+                            <p>Hamburguesa hawaiana, 5 boneless, Papas 80g y Coca-Cola de lata</p>
+                        </div>
+                        <div class="card-precio">$129.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Combo Hawaiana', 'combo', 129)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section id="hamburguesas" class="seccion-menu">
+            <h2 class="categoria-titulo">Hamburguesas</h2>
+            <div class="grid-productos">
+
+                <article class="card-producto">
+                    <img src="sencilla.jpg" alt="Hamburguesa Sencilla" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Sencilla</h3>
+                            <p>Carne de res al carbón, queso y verduras frescas</p>
+                        </div>
+                        <div class="card-precio">$55.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Sencilla', 'hamburguesa', 55)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="campestre.jpg" alt="Hamburguesa Campestre" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Campestre</h3>
+                            <p>Carne, queso, salchicha para asar y guacamole</p>
+                        </div>
+                        <div class="card-precio">$69.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Campestre', 'hamburguesa', 69)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="bacon.jpg" alt="Hamburguesa Bacon" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Bacon</h3>
+                            <p>Carne de res, queso fundido y crujiente tocino</p>
+                        </div>
+                        <div class="card-precio">$69.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Bacon', 'hamburguesa', 69)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="texana.jpg" alt="Hamburguesa Texana" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Texana</h3>
+                            <p>Carne Asadero Tocino Salchicha para asar</p>
+                        </div>
+                        <div class="card-precio">$89.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Texana', 'hamburguesa', 89)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="especial.jpg" alt="Hamburguesa Especial" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Especial</h3>
+                            <p>Carne Jamon Winnie Aguacate</p>
+                        </div>
+                        <div class="card-precio">$79.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Especial', 'hamburguesa', 79)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="doble.jpg" alt="Hamburguesa Doble" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Doble</h3>
+                            <p>Doble carne de res y doble queso fundido</p>
+                        </div>
+                        <div class="card-precio">$89.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Doble', 'hamburguesa', 89)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="triple.jpg" alt="Hamburguesa Triple" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Triple</h3>
+                            <p>Para gran apetito: 3 carnes y triple queso Salchicha para asar</p>
+                        </div>
+                        <div class="card-precio">$105.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Triple', 'hamburguesa', 105)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="tripaburger.jpg" alt="Tripaburger" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Tripaburger</h3>
+                            <p>Deliciosa combinación carne Queso tripitas doradas</p>
+                        </div>
+                        <div class="card-precio">$95.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Tripaburger', 'hamburguesa', 95)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="hawaiana.jpg" alt="Hamburguesa Hawaiana" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Hawaiana</h3>
+                            <p>Carne, queso, jamón y piña asada al carbón</p>
+                        </div>
+                        <div class="card-precio">$75.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Hawaiana', 'hamburguesa', 75)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="scape.jpg" alt="Hamburguesa Scape" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Scape</h3>
+                            <p>Carne queso aros de cebolla y salsa BBQ</p>
+                        </div>
+                        <div class="card-precio">$79.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Scape', 'hamburguesa', 79)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="bbq.jpg" alt="Hamburguesa BBQ" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>BBQ</h3>
+                            <p>Carne al carbón bañada en salsa BBQ especial Queso</p>
+                        </div>
+                        <div class="card-precio">$65.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa BBQ', 'hamburguesa', 65)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="california.jpg" alt="Hamburguesa California" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>California</h3>
+                            <p>Carne Asadero Chile california</p>
+                        </div>
+                        <div class="card-precio">$69.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa California', 'hamburguesa', 69)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="nortena.jpg" alt="Hamburguesa Norteña" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Norteña</h3>
+                            <p>Sabor del norte con ingredientes tradicionales</p>
+                        </div>
+                        <div class="card-precio">$90.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Norteña', 'hamburguesa', 90)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="pastor.jpg" alt="Hamburguesa Pastor" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Pastor</h3>
+                            <p>Carne Asadero Bistec Salchicha para asar</p>
+                        </div>
+                        <div class="card-precio">$95.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Pastor', 'hamburguesa', 95)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="philadelphia.jpg" alt="Hamburguesa Philadelphia" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Philadelphia</h3>
+                            <p>Carne Piña Queso Philadelphia</p>
+                        </div>
+                        <div class="card-precio">$85.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Philadelphia', 'hamburguesa', 85)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="monster.jpg" alt="Hamburguesa Monster" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Monster</h3>
+                            <p>2 Carnes 2 Quesos Pastor Piña Salchicha para asar</p>
+                        </div>
+                        <div class="card-precio">$115.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Monster', 'hamburguesa', 115)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="jalapeño.jpg" alt="Hamburguesa Jalapeño" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Jalapeño</h3>
+                            <p>Carne Queso Para Nachos Tocino Chile curtido asado</p>
+                        </div>
+                        <div class="card-precio">$79.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Jalapeño', 'hamburguesa', 79)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="corral.jpg" alt="Hamburguesa Corral" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Corral</h3>
+                            <p>Carne Pollo empanizado Tocino Pastor</p>
+                        </div>
+                        <div class="card-precio">$129.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Corral', 'hamburguesa', 129)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="spicy.jpg" alt="Hamburguesa Spicy" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Spicy</h3>
+                            <p>Pechuga natural tipo spicy Queso</p>
+                        </div>
+                        <div class="card-precio">$85.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Spicy', 'hamburguesa', 85)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="spicy-guacamole.jpg" alt="Hamburguesa Spicy Guacamole" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Spicy Guacamole</h3>
+                            <p>Pechuga tipo spicy Queso Guacamole</p>
+                        </div>
+                        <div class="card-precio">$95.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Spicy Guacamole', 'hamburguesa', 95)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="flamin-hot.jpg" alt="Hamburguesa Flamin Hot" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Flamin Hot</h3>
+                            <p>Carne Queso para nachos Papitas flaming hot Chile curtido asado</p>
+                        </div>
+                        <div class="card-precio">$98.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Flamin Hot', 'hamburguesa', 98)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="camaron-fiesta.jpg" alt="Hamburguesa Camarón Fiesta" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Camarón Fiesta</h3>
+                            <p>Carne Queso Philadelphia Camaron Tocino</p>
+                        </div>
+                        <div class="card-precio">$109.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Camarón Fiesta', 'hamburguesa', 109)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="costenita.jpg" alt="Hamburguesa Costeñita" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Costeñita</h3>
+                            <p>Carne Asadero Piña Camaron</p>
+                        </div>
+                        <div class="card-precio">$99.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Costeñita', 'hamburguesa', 99)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="pechuga-empanizada.jpg" alt="Pechuga Empanizada" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Pechuga Empanizada</h3>
+                            <p>Crujiente pechuga de pollo empanizada tipo Nuggets y aderezos</p>
+                        </div>
+                        <div class="card-precio">$75.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Pechuga Empanizada', 'hamburguesa', 75)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="pollo-natural.jpg" alt="Pollo Natural" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Pollo Natural</h3>
+                            <p>Jugosa pechuga de pollo a la plancha Queso</p>
+                        </div>
+                        <div class="card-precio">$75.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Pollo Natural', 'hamburguesa', 75)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="combinada.jpg" alt="Hamburguesa Combinada" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Combinada</h3>
+                            <p>Carne Pollo empanizado tipo Nuggets 2 Quesos</p>
+                        </div>
+                        <div class="card-precio">$85.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Combinada', 'hamburguesa', 85)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="doble-spicy.jpg" alt="Hamburguesa Doble Spicy" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Doble Pechuga Spicy</h3>
+                            <p>Doble carne con extra intensidad picante y 2 quesos</p>
+                        </div>
+                        <div class="card-precio">$129.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hamburguesa Doble Spicy', 'hamburguesa', 129)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="queso-takis.jpg" alt="Picante Queso Takis" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Picante Queso Takis</h3>
+                            <p>Carne Queso para nachos Takis Curtidos asados</p>
+                        </div>
+                        <div class="card-precio">$75.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Picante Queso Takis', 'hamburguesa', 75)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section id="boneless-alitas" class="seccion-menu">
+            <h2 class="categoria-titulo">Boneless y Alitas</h2>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <img src="kepapas.jpg" alt="Kepapas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Kepapas</h3>
+                            <p>Papas crujientes con queso nacho, mini boneless, salsa a elegir y aderezo ranch</p>
+                        </div>
+                        <div class="card-precio">$95.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Kepapas', 'solo-salsa', 95)">Elegir Salsa</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="boneless-10.jpg" alt="Boneless (10 Piezas)" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Boneless (10 Piezas)</h3>
+                            <p>10 piezas con papas, aderezo ranch, catsup, apio y zanahoria (1 salsa a elegir)</p>
+                        </div>
+                        <div class="card-precio">$129.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Boneless (10 Piezas)', 'solo-salsa', 129)">Elegir Salsa</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="alitas.jpg" alt="Alita Botanera" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Alita Botanera</h3>
+                            <p>Crujientes alitas de pollo bañadas en tu salsa favorita, acompañadas de aderezo ranch</p>
+                        </div>
+                        <div class="card-precio">$145.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Alita Botanera', 'solo-salsa', 145)">Elegir Salsa</button>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="hotdogs" class="seccion-menu">
+            <h2 class="categoria-titulo">Hotdogs</h2>
+            <div class="grid-productos">
+
+                <article class="card-producto">
+                    <img src="hotdog-tocino.jpg" alt="Hotdog Tocino" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Hotdog Tocino</h3>
+                            <p>Tocino, winnie Chile toreado y cebolla asada</p>
+                        </div>
+                        <div class="card-precio">$65.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hotdog Tocino', 'hotdog', 65)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="hotdog-doritos.jpg" alt="Hotdog Doritos" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Hotdog Doritos</h3>
+                            <p>salchicha doritos queso para nachos jalapeños salsa BBQ</p>
+                        </div>
+                        <div class="card-precio">$75.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hotdog Doritos', 'hotdog', 75)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="hotdog-hawaiano.jpg" alt="Hotdog Hawaiano" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Hotdog Hawaiano</h3>
+                            <p>salchicha jamón y piña queso gratinado</p>
+                        </div>
+                        <div class="card-precio">$85.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hotdog Hawaiano', 'hotdog', 85)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="hotdog-montado.jpg" alt="Hotdog Montado" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Hotdog Montado</h3>
+                            <p>Salchicha bistec de res frijoles chile toreado queso gratinado</p>
+                        </div>
+                        <div class="card-precio">$95.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Hotdog Montado', 'hotdog-montado', 95)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="bonedogo.jpg" alt="Bonedogo" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Bonedogo</h3>
+                            <p>salchicha boneless, ranch, tocino apio y salsa a elegir</p>
+                        </div>
+                        <div class="card-precio">$90.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Bonedogo', 'bonedogo', 90)">Elegir Salsa</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="philadogo.jpg" alt="Philadogo" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Philadogo</h3>
+                            <p>salchicha carne asada cebolla asada pimiento queso philadelphia</p>
+                        </div>
+                        <div class="card-precio">$80.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Philadogo', 'hotdog', 80)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="partydogo.jpg" alt="Partydogo" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Partydogo</h3>
+                            <p>salchicha tocino queso para nachos doritos salsa BBQ</p>
+                        </div>
+                        <div class="card-precio">$95.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Partydogo', 'hotdog', 95)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section id="snacks" class="seccion-menu">
+            <h2 class="categoria-titulo">Snacks</h2>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <img src="papas-tradicionales.jpg" alt="Papas Tradicionales" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Papas Tradicionales</h3>
+                            <p>Papas a la francesa crujientes</p>
+                        </div>
+                        <div class="card-precio">$50.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Papas Tradicionales', 50)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="tocipapas.jpg" alt="Tocipapas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Tocipapas</h3>
+                            <p>Papas con tocino crujiente y queso</p>
+                        </div>
+                        <div class="card-precio">$65.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Tocipapas', 65)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="salchipapas.jpg" alt="Salchipapas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Salchipapas</h3>
+                            <p>Papas a la francesa servidas con salchicha y queso fundido</p>
+                        </div>
+                        <div class="card-precio">$65.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Salchipapas', 65)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="pastor-papas.jpg" alt="Pastor Papas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Pastor Papas</h3>
+                            <p>Papas fritas acompañadas de sabrosa carne al pastor y queso</p>
+                        </div>
+                        <div class="card-precio">$75.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Pastor Papas', 75)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="nuggets.jpg" alt="Nuggets" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Nuggets</h3>
+                            <p>Crujientes nuggets de pollo acompañados de aderezos</p>
+                        </div>
+                        <div class="card-precio">$50.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Nuggets', 50)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="aros-cebolla.jpg" alt="Aros de Cebolla" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Aros de Cebolla</h3>
+                            <p>Crujientes aros de cebolla empanizados</p>
+                        </div>
+                        <div class="card-precio">$50.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Aros de Cebolla', 50)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="banderillas.jpg" alt="Banderillas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Banderillas</h3>
+                            <p>Deliciosas banderillas empanizadas doraditas</p>
+                        </div>
+                        <div class="card-precio">$50.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Banderillas', 50)">Agregar al Pedido</button>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="bebidas" class="seccion-menu">
+            <h2 class="categoria-titulo">Bebidas y Complementos</h2>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <img src="soda-lata.jpg" alt="Soda de Lata (355 ml)" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Soda de Lata (355 ml)</h3>
+                            <p>Refrescante soda en presentación de lata de 355 ml</p>
+                        </div>
+                        <div class="card-precio">$40.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Soda de Lata 355 ml', 40)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="capri-sun.jpg" alt="Capri-Sun" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Capri-Sun</h3>
+                            <p>Bebida refrescante Capri-Sun en tus sabores favoritos</p>
+                        </div>
+                        <div class="card-precio">$30.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Capri-Sun', 'caprisun', 30)">Elegir Sabor</button>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section id="tortas-tacos" class="seccion-menu">
+            <h2 class="categoria-titulo">Tortas y Tacos</h2>
+
+            <h3 class="subcategoria-titulo">🥪 Tortas</h3>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <img src="torta-bistec.jpg" alt="Torta de Bistec" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Torta de Bistec</h3>
+                            <p>Jugosa carne de bistec en pan telera caliente</p>
+                        </div>
+                        <div class="card-precio">$90.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Torta de Bistec', 'torta', 90)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="torta-colita.jpg" alt="Torta de Colita de Pavo" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Torta de Colita de Pavo</h3>
+                            <p>Tradicional colita de pavo bien doradita</p>
+                        </div>
+                        <div class="card-precio">$90.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Torta de Colita de Pavo', 'torta', 90)">Personalizar Orden</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="torta-tripitas.jpg" alt="Torta de Tripitas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Torta de Tripitas</h3>
+                            <p>Crujiente tripita dorada servida en telera</p>
+                        </div>
+                        <div class="card-precio">$110.00 MXN</div>
+                        <button class="btn-personalizar" onclick="abrirModal('Torta de Tripitas', 'torta', 110)">Personalizar Orden</button>
+                    </div>
+                </article>
+            </div>
+
+            <h3 class="subcategoria-titulo">🌮 Tacos (Orden)</h3>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <img src="tacos-bistec.jpg" alt="Tacos de Bistec" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Tacos de Bistec (Orden)</h3>
+                            <p>Orden de tacos de bistec suave y sazonado</p>
+                        </div>
+                        <div class="card-precio">$80.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Tacos de Bistec (Orden)', 80)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="tacos-pastor.jpg" alt="Tacos de Pastor" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Tacos de Pastor (Orden)</h3>
+                            <p>Orden de tacos al pastor marinados tradicionalmente</p>
+                        </div>
+                        <div class="card-precio">$80.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Tacos de Pastor (Orden)', 80)">Agregar al Pedido</button>
+                    </div>
+                </article>
+
+                <article class="card-producto">
+                    <img src="tacos-tripitas.jpg" alt="Tacos de Tripitas" class="card-imagen">
+                    <div class="card-body">
+                        <div class="card-info">
+                            <h3>Tacos de Tripitas (Orden)</h3>
+                            <p>Orden de tacos con tripita en su punto justo</p>
+                        </div>
+                        <div class="card-precio">$90.00 MXN</div>
+                        <button class="btn-agregar-directo" onclick="agregarProductoDirecto('Tacos de Tripitas (Orden)', 90)">Agregar al Pedido</button>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="barra-pedido">
+        <div class="info-total">
+            <span class="label-total">Total Pedido</span>
+            <span class="monto-total" id="txtTotal">$0.00 MXN</span>
+            <span class="badge-cantidad" id="txtCantidad">0 productos</span>
+        </div>
+        <button class="btn-ver-pedido" onclick="abrirModalCarrito()">Ver Mi Pedido</button>
+    </div>
+
+    <!-- Modal Personalización Producto -->
+    <div class="modal" id="modalProducto">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h3 id="modalTitulo">Personalizar Producto</h3>
+                <button class="cerrar-modal" onclick="cerrarModal('modalProducto')">&times;</button>
+            </div>
+
+            <!-- Opcion Combo para Hamburguesas y Hotdogs -->
+            <div class="opcion-grupo" id="seccionCombo" style="display: none;">
+                <h4>¿Hacer Combo?</h4>
+                <div class="checkbox-container">
+                    <label class="checkbox-item" style="grid-column: span 2;">
+                        <input type="checkbox" id="chkHacerCombo" onchange="toggleCombo(this)">
+                        Hacer Combo (+$40.00 MXN) - Incluye Papas Medianas y Soda de Lata
+                    </label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionCarneMontado" style="display: none;">
+                <h4>Elige la Carne:</h4>
+                <div class="checkbox-container">
+                    <label class="checkbox-item"><input type="radio" name="carne-montado" value="Pastor" checked> Pastor</label>
+                    <label class="checkbox-item"><input type="radio" name="carne-montado" value="Bistek"> Bistek</label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionCapriSun" style="display: none;">
+                <h4>Elige el Sabor:</h4>
+                <div class="checkbox-container">
+                    <label class="checkbox-item"><input type="radio" name="capri-sabor" value="Fruit Punch" checked> Fruit Punch</label>
+                    <label class="checkbox-item"><input type="radio" name="capri-sabor" value="Pacific Cooler"> Pacific Cooler</label>
+                    <label class="checkbox-item"><input type="radio" name="capri-sabor" value="Strawberry Kiwi"> Strawberry Kiwi</label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionKeKids" style="display: none;">
+                <h4>Elije tu Favorito:</h4>
+                <div class="checkbox-container">
+                    <label class="checkbox-item"><input type="radio" name="kids-platillo" value="Hamburguesa" checked> Hamburguesa</label>
+                    <label class="checkbox-item"><input type="radio" name="kids-platillo" value="Nuggets"> Nuggets</label>
+                    <label class="checkbox-item"><input type="radio" name="kids-platillo" value="Banderilla"> Banderilla</label>
+                    <label class="checkbox-item"><input type="radio" name="kids-platillo" value="5 Mini Boneless"> 5 Mini Boneless</label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionSalsas" style="display: none;">
+                <h4>Elige tu Salsa:</h4>
+                <div class="checkbox-container">
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="BBQ" checked> BBQ</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="BBQ HOT"> BBQ HOT</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="BUFFALO"> BUFFALO</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="MANGO HABANERO"> MANGO HABANERO</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="AJO PARMESANO"> AJO PARMESANO</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="PIMIENTA LIMON"> PIMIENTA LIMÓN</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="PIÑA HOT"> PIÑA HOT</label>
+                    <label class="checkbox-item"><input type="radio" name="salsa" value="TERIYAKI"> TERIYAKI</label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionIngredientes" style="display: none;">
+                <h4>Personaliza tus Aderezos/Ingredientes (Quitar):</h4>
+                <div class="checkbox-container" id="contenedorIngredientes">
+                    <label class="checkbox-item"><input type="checkbox" checked value="Mayonesa"> Mayonesa</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Catsup"> Catsup</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Mostaza"> Mostaza</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Cebolla Guisada"> Cebolla Guisada</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Tomate"> Tomate</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Pepinillo"> Pepinillo</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Lechuga"> Lechuga</label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionIngredientesHotdogs" style="display: none;">
+                <h4>Personaliza tus Aderezos/Ingredientes (Quitar):</h4>
+                <div class="checkbox-container" id="contenedorIngredientesHotdogs">
+                    <label class="checkbox-item"><input type="checkbox" checked value="Mayonesa"> Mayonesa</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Catsup"> Catsup</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Mostaza"> Mostaza</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Cebolla"> Cebolla</label>
+                </div>
+            </div>
+
+            <!-- Ingredientes Extras con costo -->
+            <div class="opcion-grupo" id="seccionExtras" style="display: none;">
+                <h4>Agregar Ingredientes Extras:</h4>
+                <div class="checkbox-container" id="contenedorExtras">
+                    <label class="checkbox-item"><input type="checkbox" data-costo="25" value="Carne Extra (+$25)"> Carne Extra (+$25)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="15" value="Extra Queso (+$15)"> Extra Queso (+$15)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="15" value="Tocino Extra (+$15)"> Tocino Extra (+$15)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="15" value="Salchicha para Asar (+$15)"> Salchicha para Asar (+$15)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="15" value="Piña Extra (+$15)"> Piña Extra (+$15)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="15" value="Aros de Cebolla (+$15)"> Aros de Cebolla (+$15)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="15" value="Guacamole (+$15)"> Guacamole (+$15)</label>
+                    <label class="checkbox-item"><input type="checkbox" data-costo="10" value="Jalapeños Extra (+$10)"> Jalapeños Extra (+$10)</label>
+                </div>
+            </div>
+
+            <div class="opcion-grupo" id="seccionIngredientesTortas" style="display: none;">
+                <h4>Personaliza tus Aderezos/Ingredientes (Quitar):</h4>
+                <div class="checkbox-container" id="contenedorIngredientesTortas">
+                    <label class="checkbox-item"><input type="checkbox" checked value="Mayonesa"> Mayonesa</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Mostaza"> Mostaza</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Cebolla"> Cebolla</label>
+                    <label class="checkbox-item"><input type="checkbox" checked value="Lechuga"> Lechuga</label>
+                </div>
+            </div>
+
+            <button class="btn-confirmar" onclick="guardarSeleccionProducto()">Agregar al Pedido</button>
+        </div>
+    </div>
+
+    <!-- Modal Carrito de Compras -->
+    <div class="modal" id="modalCarrito">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h3>Resumen de tu Pedido</h3>
+                <button class="cerrar-modal" onclick="cerrarModal('modalCarrito')">&times;</button>
+            </div>
+            
+            <div id="listaCarrito">
+                <p style="color: #aaa; text-align: center;">Tu pedido está vacío</p>
+            </div>
+            
+            <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
+                <span>Total:</span>
+                <span id="modalTotalCarrito">$0.00 MXN</span>
+            </div>
+
+            <div id="seccionDatosEnvio" style="display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 12px;">
+                <h4 style="color: #ffcc00; font-size: 0.95rem; margin-bottom: 10px;">Datos para Ordene y Recoja</h4>
+                
+                <div class="form-grupo">
+                    <label for="clienteNombre">* Tu Nombre Completo:</label>
+                    <input type="text" id="clienteNombre" placeholder="Ej. Juan Pérez">
+                </div>
+                <div class="form-grupo">
+                    <label for="clienteSucursal">* Sucursal para Recoger:</label>
+                    <select id="clienteSucursal">
+                        <option value="">-- Selecciona Sucursal --</option>
+                        <option value="Parajes de San Isidro">Sucursal Parajes de San Isidro</option>
+                        <option value="Finca Bonita">Sucursal Finca Bonita</option>
+                        <option value="Termo">Sucursal Termo</option>
+                    </select>
+                </div>
+                <div class="form-grupo">
+                    <label for="clienteTelExtra">Teléfono de Contacto:</label>
+                    <input type="tel" id="clienteTelExtra" placeholder="Ej. 656 000 0000">
+                </div>
+                <div class="form-grupo">
+                    <label for="clienteNotas">Nota Adicional (Opcional):</label>
+                    <textarea id="clienteNotas" placeholder="Ej. Pagaré con billete de $500, estaré ahí en 20 min, etc."></textarea>
+                </div>
+                <button class="btn-confirmar" style="background: #25d366; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="enviarPedidoWhatsApp()">
+                    Confirmar Orden y Enviar a WhatsApp
+                </button>
+            </div>
+
+            <button id="btnContinuarPidiendo" class="btn-confirmar" style="margin-top: 10px; background: #444;" onclick="cerrarModal('modalCarrito')">Continuar Pidiendo</button>
+        </div>
+    </div>
+
+    <script>
+        let carrito = [];
+        let productoActual = { nombre: '', precio: 0, tipo: '' };
+
+        function generarNumeroCliente() {
+            const aleatorio = Math.floor(1000 + Math.random() * 9000);
+            const fecha = new Date();
+            const min = fecha.getMinutes().toString().padStart(2, '0');
+            return `KP-${min}${aleatorio}`;
+        }
+
+        function filtrarCategoria(idCategoria, boton) {
+            const secciones = document.querySelectorAll('.seccion-menu');
+            const botones = document.querySelectorAll('.btn-nav');
+            botones.forEach(b => b.classList.remove('activo'));
+            boton.classList.add('activo');
+            secciones.forEach(sec => {
+                if (idCategoria === 'todas' || sec.id === idCategoria) {
+                    sec.classList.remove('oculto');
+                } else {
+                    sec.classList.add('oculto');
+                }
+            });
+        }
+
+        function abrirModal(nombreProducto, tipo, precio) {
+            productoActual = { nombre: nombreProducto, precioBase: precio, tipo: tipo };
+            document.getElementById('modalTitulo').innerText = nombreProducto;
+            
+            // Ocultar todas las secciones
+            document.getElementById('seccionCombo').style.display = 'none';
+            document.getElementById('chkHacerCombo').checked = false;
+            document.getElementById('seccionCarneMontado').style.display = 'none';
+            document.getElementById('seccionCapriSun').style.display = 'none';
+            document.getElementById('seccionKeKids').style.display = 'none';
+            document.getElementById('seccionSalsas').style.display = 'none';
+            document.getElementById('seccionIngredientes').style.display = 'none';
+            document.getElementById('seccionIngredientesHotdogs').style.display = 'none';
+            document.getElementById('seccionIngredientesTortas').style.display = 'none';
+            document.getElementById('seccionExtras').style.display = 'none';
+
+            // Desmarcar extras
+            document.querySelectorAll('#contenedorExtras input[type="checkbox"]').forEach(chk => chk.checked = false);
+
+            if (['hamburguesa', 'hotdog', 'hotdog-montado', 'bonedogo'].includes(tipo)) {
+                document.getElementById('seccionCombo').style.display = 'block';
+                document.getElementById('seccionExtras').style.display = 'block';
+            }
+
+            if (tipo === 'hotdog-montado') {
+                document.getElementById('seccionCarneMontado').style.display = 'block';
+                document.getElementById('seccionIngredientesHotdogs').style.display = 'block';
+            } else if (tipo === 'caprisun') {
+                document.getElementById('seccionCapriSun').style.display = 'block';
+            } else if (tipo === 'bonedogo') {
+                document.getElementById('seccionSalsas').style.display = 'block';
+                document.getElementById('seccionIngredientesHotdogs').style.display = 'block';
+            } else if (tipo === 'hotdog') {
+                document.getElementById('seccionIngredientesHotdogs').style.display = 'block';
+            } else if (tipo === 'torta') {
+                document.getElementById('seccionIngredientesTortas').style.display = 'block';
+            } else if (tipo === 'hamburguesa') {
+                document.getElementById('seccionIngredientes').style.display = 'block';
+            } else if (tipo === 'boneless-lunes-miercoles' || tipo === 'solo-salsa') {
+                document.getElementById('seccionSalsas').style.display = 'block';
+            } else if (tipo === 'ke-kids') {
+                document.getElementById('seccionKeKids').style.display = 'block';
+            } else if (tipo === 'combo') {
+                document.getElementById('seccionSalsas').style.display = 'block';
+                document.getElementById('seccionIngredientes').style.display = 'block';
+                document.getElementById('seccionExtras').style.display = 'block';
+            }
+            
+            document.getElementById('modalProducto').style.display = 'flex';
+        }
+
+        function guardarSeleccionProducto() {
+            let detalles = [];
+            let precioFinal = productoActual.precioBase;
+
+            // Opción Combo (+40)
+            const chkCombo = document.getElementById('chkHacerCombo');
+            if (chkCombo && chkCombo.checked && ['hamburguesa', 'hotdog', 'hotdog-montado', 'bonedogo'].includes(productoActual.tipo)) {
+                precioFinal += 40;
+                detalles.push("EN COMBO (Papas Med. + Soda)");
+            }
+
+            if (productoActual.tipo === 'hotdog-montado') {
+                const carne = document.querySelector('input[name="carne-montado"]:checked');
+                if (carne) detalles.push(`Carne: ${carne.value}`);
+            }
+
+            if (productoActual.tipo === 'caprisun') {
+                const sabor = document.querySelector('input[name="capri-sabor"]:checked');
+                if (sabor) detalles.push(`Sabor: ${sabor.value}`);
+            }
+
+            if (productoActual.tipo === 'ke-kids') {
+                const favorito = document.querySelector('input[name="kids-platillo"]:checked');
+                if (favorito) detalles.push(`Opción: ${favorito.value}`);
+            }
+
+            if (['solo-salsa', 'combo', 'bonedogo', 'boneless-lunes-miercoles'].includes(productoActual.tipo)) {
+                const salsa = document.querySelector('input[name="salsa"]:checked');
+                if (salsa) detalles.push(`Salsa: ${salsa.value}`);
+            }
+
+            if (['hamburguesa', 'combo'].includes(productoActual.tipo)) {
+                const sinIngredientes = [];
+                document.querySelectorAll('#contenedorIngredientes input[type="checkbox"]').forEach(chk => {
+                    if (!chk.checked) sinIngredientes.push(chk.value);
+                });
+                if (sinIngredientes.length > 0) {
+                    detalles.push(`Sin: ${sinIngredientes.join(', ')}`);
+                }
+            }
+
+            if (['hotdog', 'hotdog-montado', 'bonedogo'].includes(productoActual.tipo)) {
+                const sinIngredientes = [];
+                document.querySelectorAll('#contenedorIngredientesHotdogs input[type="checkbox"]').forEach(chk => {
+                    if (!chk.checked) sinIngredientes.push(chk.value);
+                });
+                if (sinIngredientes.length > 0) {
+                    detalles.push(`Sin: ${sinIngredientes.join(', ')}`);
+                }
+            }
+
+            if (productoActual.tipo === 'torta') {
+                const sinIngredientes = [];
+                document.querySelectorAll('#contenedorIngredientesTortas input[type="checkbox"]').forEach(chk => {
+                    if (!chk.checked) sinIngredientes.push(chk.value);
+                });
+                if (sinIngredientes.length > 0) {
+                    detalles.push(`Sin: ${sinIngredientes.join(', ')}`);
+                }
+            }
+
+            // Extras con Costo
+            const extrasSeleccionados = [];
+            document.querySelectorAll('#contenedorExtras input[type="checkbox"]:checked').forEach(chk => {
+                extrasSeleccionados.push(chk.value);
+                precioFinal += parseFloat(chk.getAttribute('data-costo'));
+            });
+            if (extrasSeleccionados.length > 0) {
+                detalles.push(`Extras: ${extrasSeleccionados.join(', ')}`);
+            }
+
+            carrito.push({
+                id: Date.now(),
+                nombre: productoActual.nombre,
+                precio: precioFinal,
+                detalles: detalles.length > 0 ? detalles.join(' | ') : 'Sin modificaciones'
+            });
+
+            actualizarBarraPedido();
+            cerrarModal('modalProducto');
+        }
+
+        function agregarProductoDirecto(nombre, precio) {
+            carrito.push({
+                id: Date.now(),
+                nombre: nombre,
+                precio: precio,
+                detalles: 'Sin especificaciones'
+            });
+            actualizarBarraPedido();
+        }
+
+        function eliminarDelCarrito(id) {
+            carrito = carrito.filter(item => item.id !== id);
+            actualizarBarraPedido();
+            renderizarListaCarrito();
+        }
+
+        function actualizarBarraPedido() {
+            const total = carrito.reduce((sum, item) => sum + item.precio, 0);
+            document.getElementById('txtTotal').innerText = `$${total.toFixed(2)} MXN`;
+            document.getElementById('txtCantidad').innerText = `${carrito.length} ${carrito.length === 1 ? 'producto' : 'productos'}`;
+        }
+
+        function abrirModalCarrito() {
+            renderizarListaCarrito();
+            document.getElementById('modalCarrito').style.display = 'flex';
+        }
+
+        function renderizarListaCarrito() {
+            const contenedor = document.getElementById('listaCarrito');
+            const totalModal = document.getElementById('modalTotalCarrito');
+            const seccionDatos = document.getElementById('seccionDatosEnvio');
+            
+            if (carrito.length === 0) {
+                contenedor.innerHTML = '<p style="color: #aaa; text-align: center;">Tu pedido está vacío</p>';
+                totalModal.innerText = '$0.00 MXN';
+                seccionDatos.style.display = 'none';
+                return;
+            }
+
+            contenedor.innerHTML = '';
+            let total = 0;
+
+            carrito.forEach(item => {
+                total += item.precio;
+                contenedor.innerHTML += `
+                    <div class="item-carrito">
+                        <div class="item-detalles">
+                            <h4>${item.nombre}</h4>
+                            <p>${item.detalles}</p>
+                        </div>
+                        <div class="item-precio-eliminar">
+                            <div>$${item.precio.toFixed(2)}</div>
+                            <button class="btn-eliminar" onclick="eliminarDelCarrito(${item.id})">Quitar</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalModal.innerText = `$${total.toFixed(2)} MXN`;
+            seccionDatos.style.display = 'block';
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function enviarPedidoWhatsApp() {
+            const nombre = document.getElementById('clienteNombre').value.trim();
+            const sucursal = document.getElementById('clienteSucursal').value;
+            const telExtra = document.getElementById('clienteTelExtra').value.trim();
+            const notas = document.getElementById('clienteNotas').value.trim();
+
+            if (!nombre) {
+                alert('Por favor ingresa tu nombre.');
+                return;
+            }
+            if (!sucursal) {
+                alert('Por favor selecciona la sucursal donde recogerás tu pedido.');
+                return;
+            }
+
+            const numCliente = generarNumeroCliente();
+
+            let mensaje = `*ORDENE Y RECOJA - KE-PAPAS*\n`;
+            mensaje += `*NUM. DE CLIENTE:* #${numCliente}\n`;
+            mensaje += `-------------------------------\n`;
+            mensaje += `*Cliente:* ${nombre}\n`;
+            mensaje += `*Sucursal a Recoger:* ${sucursal}\n`;
+            if (telExtra) mensaje += `*Teléfono:* ${telExtra}\n`;
+            if (notas) mensaje += `*Notas:* ${notas}\n`;
+            mensaje += `-------------------------------\n`;
+            mensaje += `*DETALLE DEL PEDIDO:*\n\n`;
+
+            let total = 0;
+            carrito.forEach((item, index) => {
+                total += item.precio;
+                mensaje += `${index + 1}. *${item.nombre}* - $${item.precio.toFixed(2)}\n`;
+                mensaje += `   _${item.detalles}_\n`;
+            });
+
+            mensaje += `\n-------------------------------\n`;
+            mensaje += `*TOTAL A PAGAR:* $${total.toFixed(2)} MXN\n`;
+            mensaje += `-------------------------------`;
+
+            const numeroWhatsApp = "526563865897";
+            const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+    </script>
+
+</body>
+</html>
